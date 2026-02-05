@@ -5,6 +5,7 @@ export MY_PUBLIC_IP=$(dig @resolver1.opendns.com -t A -4 myip.opendns.com +short
 export GRE_IF_NAME='gre1'
 export FW_MARK='0x15'
 export RT_TABLE_NAME='tableX'
+export VPN_DNS_IP='8.8.8.8' # DNS Requests to this IP will be routed over GRE tunnel.
 
 # RU YACLOUD
 export RU_HOST_FQDN="vpn-ru.pytn.ru."
