@@ -36,7 +36,7 @@ ${ipt_mangle} -F ROUTE_OVER_${GRE_IF_NAME^^}
 for each_action in "-D" "-I" ; do
   # All containers traffic should be routed over GRE tunnel, exception rules will be applied in the chain
   ${ipt_mangle} ${each_action} PREROUTING -i docker0 -j ROUTE_OVER_${GRE_IF_NAME^^}
-  # DNS traffic from host to Google DNS should be routed over GRE tunnel
+  # DNS traffic from host to VPN_DNS_IP (Google DNS) should be routed over GRE tunnel
   ${ipt_mangle} ${each_action} PREROUTING -p udp -d ${VPN_DNS_IP} -m udp --dport 53 -j ROUTE_OVER_${GRE_IF_NAME^^}
 done
 
@@ -50,6 +50,7 @@ ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -d 185.71.66.0/24 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 4500 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 500 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 1701 -j ACCEPT
+# DNS traffic except to VPN_DNS_IP (Google DNS) routed without GRE tunnel
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --dport 53 ! -d ${VPN_DNS_IP} -j ACCEPT
 
 # Default action: mark traffic

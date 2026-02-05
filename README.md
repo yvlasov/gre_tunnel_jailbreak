@@ -17,12 +17,10 @@ docker run \
 ```
 
 ```
-#/etc/dnsmasq.conf
+#/etc/dnsmasq.conf for Yandex Cloud server
 port=53
-#listen-address=192.168.0.26,127.0.0.1
-#bind-interfaces
+listen-address=172.17.0.1 # Docker host 
 
-# Route specific domains to specific DNS servers
 server=/youtube.com/8.8.8.8
 server=/google.com/8.8.8.8
 server=/goo.gl/8.8.8.8
@@ -30,10 +28,7 @@ server=/facebook.com/8.8.8.8
 server=/instagram.com/8.8.8.8
 server=/cdninstagram.com/8.8.8.8
 
+server=127.0.0.53
 
-# Default upstream
-server=192.168.0.1
-
-# Cache settings
 cache-size=1000
 ```
