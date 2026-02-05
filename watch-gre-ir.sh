@@ -7,5 +7,5 @@ if ping -c 3 -W 3  $RU_PEER_ADDR > /dev/null ; then
   exit 0
 fi
 
-$(dirname $0)/start-gre-ir.sh
+"$(dirname "${BASH_SOURCE[0]}")/start-gre-ir.sh"
 

@@ -18,7 +18,7 @@ for each_action in "-D" "-I" ; do
   iptables -t filter ${each_action} FORWARD -d ${RU_PEER_ADDR} ! -i ${GRE_IF_NAME} -o ${GRE_IF_NAME}   -j ACCEPT
   iptables -t filter ${each_action} FORWARD -s ${RU_PEER_ADDR} -i ${GRE_IF_NAME} ! -o ${GRE_IF_NAME}   -j ACCEPT
  
-  # PPP vpn clients will be in
+  # SSH-PPP vpn clients traffic rules
   iptables -t filter ${each_action} FORWARD ! -s 10.255.255.0/30 -d 10.255.255.0/30 -j ACCEPT
   iptables -t filter ${each_action} FORWARD -s 10.255.255.0/30 ! -d 10.255.255.0/30 -j ACCEPT
   iptables -t nat ${each_action} POSTROUTING -s 10.255.255.0/30 ! -d 10.255.255.0/30 -j MASQUERADE
