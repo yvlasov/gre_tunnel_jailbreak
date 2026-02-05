@@ -12,8 +12,10 @@ docker run \
     -d --privileged \
     hwdsl2/ipsec-vpn-server
 ```
+
 ```bash
- ssh -J ubuntu@34.244.227.121 10.255.255.3
+# Connect to Zaitsevs RPI
+ssh -J ubuntu@34.244.227.121 10.255.255.3
 ```
 
 ```

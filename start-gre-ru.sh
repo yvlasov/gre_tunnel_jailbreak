@@ -22,8 +22,6 @@ ip tunnel add ${GRE_IF_NAME} mode gre remote ${IR_HOST_IP} local ${RU_HOST_IP_LO
 ip addr add ${RU_PEER_ADDR}/30 peer ${IR_PEER_ADDR}/30 dev ${GRE_IF_NAME}
 ip link set ${GRE_IF_NAME} up multicast off
 
-iptables -t nat -I POSTROUTING 1 -o ${GRE_IF_NAME} -j MASQUERADE
-
 ipt_mangle="/sbin/iptables -t mangle"
 
 echo "Setting up iptables mangle rules for ${GRE_IF_NAME^^} tunnel traffic"
@@ -34,6 +32,8 @@ ${ipt_mangle} -F ROUTE_OVER_${GRE_IF_NAME^^}
 
 # Hook into PREROUTING
 for each_action in "-D" "-I" ; do
+  # Masquerade traffic roted over GRE tunnel to ensure return traffic is properly routed back to the host
+  iptables -t nat ${each_action} POSTROUTING -o ${GRE_IF_NAME} -j MASQUERADE
   # All containers traffic should be routed over GRE tunnel, exception rules will be applied in the chain
   ${ipt_mangle} ${each_action} PREROUTING -i docker0 -j ROUTE_OVER_${GRE_IF_NAME^^}
   # DNS traffic from host to VPN_DNS_IP (Google DNS) should be routed over GRE tunnel

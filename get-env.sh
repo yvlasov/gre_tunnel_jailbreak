@@ -9,8 +9,7 @@ export VPN_DNS_IP='8.8.8.8' # DNS Requests to this IP will be routed over GRE tu
 
 # RU YACLOUD
 export RU_HOST_FQDN="vpn-ru.pytn.ru."
-export RU_HOST_IP_BY_FQDN=$(dig @resolver1.opendns.com -t A -4 ${RU_HOST_FQDN} +short)
-export RU_HOST_IP=${RU_HOST_IP_BY_FQDN}
+export RU_HOST_IP=$(dig @resolver1.opendns.com -t A -4 ${RU_HOST_FQDN} +short)
 export RU_HOST_IP_LOCAL=10.129.0.24
 export RU_PEER_ADDR=172.31.1.1
 export YC_DNS_TTL=20
