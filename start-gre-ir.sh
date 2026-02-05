@@ -1,5 +1,6 @@
 #!/bin/bash
-source $(dirname $0)/get-env.sh
+
+source "$(dirname "${BASH_SOURCE[0]}")/get-env.sh"
 
 echo 1 > /proc/sys/net/ipv4/ip_forward
 echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter

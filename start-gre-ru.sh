@@ -5,9 +5,9 @@
 #@reboot /root/tunnel/start-gre.sh
 
 sleep 3
-set -x
+#set -x
 
-source $(dirname $0)/get-env.sh
+source "$(dirname "${BASH_SOURCE[0]}")/get-env.sh"
 
 # Set own public IP if DNS not updated yet
 export RU_HOST_IP=${MY_PUBLIC_IP}
