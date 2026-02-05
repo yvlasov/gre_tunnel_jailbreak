@@ -1,4 +1,10 @@
-# gre_tunnel_jailbreak
+# Personal VPN infrastructure *l2tp/GRE/ssh-ppp*
+
+## RU server
+
+### RU server Client l2tp vpn 
+See details:
+* https://github.com/hwdsl2/setup-ipsec-vpn/
 
 ```bash
 docker run \
@@ -12,11 +18,7 @@ docker run \
     -d --privileged \
     hwdsl2/ipsec-vpn-server
 ```
-
-```bash
-# Connect to Zaitsevs RPI
-ssh -J ubuntu@34.244.227.121 10.255.255.3
-```
+### RU server DNS request routing using dnsmasq
 
 ```
 #/etc/dnsmasq.conf for Yandex Cloud server
@@ -34,3 +36,14 @@ server=127.0.0.53
 
 cache-size=1000
 ```
+
+
+## IR Server
+
+### IR Server SSH-PPP VPN Client
+
+```bash
+# Connect to Zaitsevs RPI
+ssh -J ubuntu@34.244.227.121 10.255.255.3
+```
+
