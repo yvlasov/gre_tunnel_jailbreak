@@ -34,7 +34,11 @@ ${ipt_mangle} -F ROUTE_OVER_${GRE_IF_NAME^^}
 
 # Hook into PREROUTING
 for each_action in "-D" "-I" ; do
+  # All containers traffic should be routed over GRE tunnel, exception rules will be applied in the chain
   ${ipt_mangle} ${each_action} PREROUTING -i docker0 -j ROUTE_OVER_${GRE_IF_NAME^^}
+  # DNS traffic from host to Google DNS should be routed over GRE tunnel
+  ${ipt_mangle} ${each_action} PREROUTING ! -i docker0 -p udp -d 8.8.8.8/32 -m udp --dport 53 -j MARK --set-mark ${FW_MARK}
+  ${ipt_mangle} ${each_action} PREROUTING ! -i docker0 -p udp -d 8.8.8.8/32 -m udp --dport 53 -j MARK --set-mark ${FW_MARK}
 done
 
 # Populate chain with exception rules
@@ -47,7 +51,7 @@ ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -d 185.71.66.0/24 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 4500 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 500 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 1701 -j ACCEPT
-${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --dport 53 -j ACCEPT
+${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --dport 53 ! -d 8.8.8.8 -j ACCEPT
 
 # Default action: mark traffic
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -j MARK --set-mark ${FW_MARK}
