@@ -19,9 +19,9 @@ for each_action in "-D" "-I" ; do
   iptables -t filter ${each_action} FORWARD -s ${RU_PEER_ADDR} -i ${GRE_IF_NAME} ! -o ${GRE_IF_NAME}   -j ACCEPT
  
   # SSH-PPP vpn clients traffic rules
-  iptables -t filter ${each_action} FORWARD ! -s 10.255.255.0/30 -d 10.255.255.0/30 -j ACCEPT
-  iptables -t filter ${each_action} FORWARD -s 10.255.255.0/30 ! -d 10.255.255.0/30 -j ACCEPT
-  iptables -t nat ${each_action} POSTROUTING -s 10.255.255.0/30 ! -d 10.255.255.0/30 -j MASQUERADE
+  #iptables -t filter ${each_action} FORWARD ! -s ${SSH_PPP_PTP_RANGE} -d ${SSH_PPP_PTP_RANGE} -j ACCEPT
+  #iptables -t filter ${each_action} FORWARD -s ${SSH_PPP_PTP_RANGE} ! -d ${SSH_PPP_PTP_RANGE} -j ACCEPT
+  iptables -t nat ${each_action} POSTROUTING ! -o ppp+ -s ${SSH_PPP_PTP_RANGE} ! -d ${SSH_PPP_PTP_RANGE} -j MASQUERADE
 
   iptables -t mangle ${each_action} PREROUTING -i ppp+ -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1460
   iptables -t mangle ${each_action} FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu

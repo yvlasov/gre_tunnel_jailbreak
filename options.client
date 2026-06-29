@@ -1,0 +1,7 @@
+#/etc/ppp/options.client
+lock
+noauth
+defaultroute
+10.255.255.4:10.255.255.1
+defaultroute-metric 0
+replacedefaultroute
