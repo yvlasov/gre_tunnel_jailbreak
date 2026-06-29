@@ -41,12 +41,11 @@ init_setup() {
    echo 1 > /proc/sys/net/ipv4/ip_forward
    echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter
 
-   # Setup routing table for VPN tunnel traffic
-   ip rule add fwmark ${FW_MARK} lookup ${RT_TABLE_NAME}
-   ip route add default via ${IR_PEER_ADDR} dev ppp0 table ${RT_TABLE_NAME}
+   # Setup policy routing rule for fwmark (idempotent; ppp0 route added later in start_tunnel)
+   ip rule add fwmark ${FW_MARK} lookup ${RT_TABLE_NAME} 2>/dev/null || true
 
    # Create chain for routing exceptions
-   ${ipt_mangle} -N ROUTE_OVER_PPP
+   ${ipt_mangle} -N ROUTE_OVER_PPP 2>/dev/null || true
    # Flush existing chain if it exists
    ${ipt_mangle} -F ROUTE_OVER_PPP
    # Network System ports VPN,DNS,etc..
@@ -102,7 +101,10 @@ start_tunnel() {
    sudo -u root "$TUNNEL_SCRIPT" &
    echo $! > "$PIDFILE"
    sleep 15
-   
+
+   # Add/update route through ppp0 now that the tunnel should be up
+   ip route replace default via ${IR_PEER_ADDR} dev ppp0 table ${RT_TABLE_NAME}
+
    # Apply rules after tunnel is up
    apply_rules
 }
@@ -116,7 +118,7 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
-trap init_setup EXIT INT TERM
+init_setup
 
 while true; do
    if ! check_tunnel; then
