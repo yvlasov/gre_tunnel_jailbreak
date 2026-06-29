@@ -116,6 +116,8 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
+trap init_setup EXIT INT TERM
+
 while true; do
    if ! check_tunnel; then
        logger "PPP-SSH tunnel to ${REMOTE_ENDPOINT} down, restarting"
