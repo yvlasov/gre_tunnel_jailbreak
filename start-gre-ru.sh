@@ -36,8 +36,11 @@ for each_action in "-D" "-I" ; do
   iptables -t nat ${each_action} POSTROUTING -o ${GRE_IF_NAME} -j MASQUERADE
   # All containers traffic should be routed over GRE tunnel, exception rules will be applied in the chain
   ${ipt_mangle} ${each_action} PREROUTING -i docker0 -j ROUTE_OVER_${GRE_IF_NAME^^}
+  # Route GOOGLE DNS over tunnel
+  ${ipt_mangle} ${each_action} PREROUTING -d 8.8.8.8/32 -j ROUTE_OVER_${GRE_IF_NAME^^}
   # DNS traffic from host to VPN_DNS_IP (Google DNS) should be routed over GRE tunnel
   ${ipt_mangle} ${each_action} PREROUTING -p udp -d ${VPN_DNS_IP} -m udp --dport 53 -j ROUTE_OVER_${GRE_IF_NAME^^}
+  ${ipt_mangle} ${each_action} OUTPUT -p udp -d ${VPN_DNS_IP} -m udp --dport 53 -j ROUTE_OVER_${GRE_IF_NAME^^}
 done
 
 # Populate chain with exception rules
@@ -50,6 +53,8 @@ ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -d 185.71.66.0/24 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 4500 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 500 -j ACCEPT
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --sport 1701 -j ACCEPT
+# Local docker trafic routed localy
+${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -d 172.16.0.0/12 -j ACCEPT
 # DNS traffic except to VPN_DNS_IP (Google DNS) routed without GRE tunnel
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --dport 53 ! -d ${VPN_DNS_IP} -j ACCEPT
 
@@ -57,5 +62,5 @@ ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -p udp --dport 53 ! -d ${VPN_DNS_IP
 ${ipt_mangle} -A ROUTE_OVER_${GRE_IF_NAME^^} -j MARK --set-mark ${FW_MARK}
 
 ip rule add fwmark ${FW_MARK} lookup ${RT_TABLE_NAME}
-ip route add default via ${RU_PEER_ADDR} dev ${GRE_IF_NAME} table ${RT_TABLE_NAME}
+ip route add default via ${IR_PEER_ADDR} dev ${GRE_IF_NAME} table ${RT_TABLE_NAME}
 
