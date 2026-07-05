@@ -49,9 +49,10 @@ init_setup() {
    # Flush existing chain if it exists
    ${ipt_mangle} -F ROUTE_OVER_PPP
    # Network System ports VPN,DNS,etc..
-   ${ipt_mangle} -A ROUTE_OVER_PPP -p udp --sport 4500 -j ACCEPT
-   ${ipt_mangle} -A ROUTE_OVER_PPP -p udp --sport 500 -j ACCEPT
-   ${ipt_mangle} -A ROUTE_OVER_PPP -p udp --sport 1701 -j ACCEPT
+   ${ipt_mangle} -A ROUTE_OVER_PPP -i docker0 -p udp -s 172.16.0.0/12 --sport 4500 -j ACCEPT
+   ${ipt_mangle} -A ROUTE_OVER_PPP -i docker0 -p udp -s 172.16.0.0/12 --sport 500 -j ACCEPT
+   ${ipt_mangle} -A ROUTE_OVER_PPP -i docker0 -p udp -s 172.16.0.0/12 --sport 1701 -j ACCEPT
+   ${ipt_mangle} -A ROUTE_OVER_PPP -i docker0 -p tcp -s 172.16.0.0/12 --sport 1194 -j ACCEPT
    # Local docker trafic routed localy
    ${ipt_mangle} -A ROUTE_OVER_PPP -d 172.16.0.0/12 -j ACCEPT
    # DNS traffic except to VPN_DNS_IP (Google DNS) routed without GRE tunnel
